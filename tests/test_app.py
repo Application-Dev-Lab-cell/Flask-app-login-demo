@@ -1,10 +1,10 @@
 import pytest
-from app import app   # 👈 import your Flask app object
+import app   # 👈 import your Flask app object
 
 @pytest.fixture
 def client():
-    app.testing = True
-    return app.test_client()
+    app.app.testing = True   # 👈 note: app.app because you imported the module
+    return app.app.test_client()
 
 def test_homepage(client):
     """Check if homepage loads successfully"""
