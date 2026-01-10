@@ -20,7 +20,7 @@ def test_login_page(client):
 def test_login_success(client):
     response = client.post('/login', data={
         'username': 'admin',   # replace with real valid user
-        'password': 'password'
+        'password': 'password123'
     }, follow_redirects=True)
     assert b"dashboard" in response.data or b"Welcome" in response.data
 
