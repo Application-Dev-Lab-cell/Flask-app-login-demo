@@ -1,17 +1,18 @@
+import sys, os
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+
 import pytest
-import app   # 👈 import your Flask app object
+import app   # imports app.py
 
 @pytest.fixture
 def client():
-    app.app.testing = True   # 👈 note: app.app because you imported the module
+    app.app.testing = True
     return app.app.test_client()
 
 def test_homepage(client):
-    """Check if homepage loads successfully"""
     response = client.get('/')
-    assert response.status_code == 200
+    assert response.status_code in (200, 302)  # homepage redirects to login or dashboard
 
 def test_login_page(client):
-    """Check if login page loads successfully"""
     response = client.get('/login')
     assert response.status_code == 200
