@@ -2,7 +2,9 @@ name: CI/CD Pipeline to Heroku
 
 on:
   push:
-    branches: [ main ]
+    branches:
+      - main
+      - dev   # 👈 add dev branch for staging
 
 jobs:
   build-and-test:
@@ -25,10 +27,11 @@ jobs:
           pip install -r requirements.txt
 
       - name: Run tests
-        run: pytest   # 👈 Your test suite runs here
+        run: pytest   # 👈 your test suite runs here
 
-  deploy:
-    needs: build-and-test   # 👈 Only runs if tests pass
+  deploy-production:
+    if: github.ref == 'refs/heads/main'
+    needs: build-and-test
     runs-on: ubuntu-latest
 
     steps:
@@ -37,7 +40,23 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Deploy to Heroku
+      - name: Deploy to Heroku (Production)
         run: |
           git remote add heroku https://heroku:${{ secrets.HEROKU_API_KEY }}@git.heroku.com/${{ secrets.HEROKU_APP_NAME }}.git
           git push heroku main --force
+
+  deploy-staging:
+    if: github.ref == 'refs/heads/dev'
+    needs: build-and-test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Deploy to Heroku (Staging)
+        run: |
+          git remote add staging https://heroku:${{ secrets.HEROKU_API_KEY }}@git.heroku.com/${{ secrets.HEROKU_STAGING_APP_NAME }}.git
+          git push staging dev:main --force
