@@ -1,18 +1,41 @@
-name: Deploy to Heroku (Git)
+name: CI/CD Pipeline to Heroku
 
 on:
   push:
     branches: [ main ]
 
 jobs:
-  deploy:
+  build-and-test:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
         with:
-          fetch-depth: 0   # 👈 This makes the clone full, not shallow
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run tests
+        run: pytest   # 👈 Your test suite runs here
+
+  deploy:
+    needs: build-and-test   # 👈 Only runs if tests pass
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
 
       - name: Deploy to Heroku
         run: |
