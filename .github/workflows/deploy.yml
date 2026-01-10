@@ -11,6 +11,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
+        with:
+          fetch-depth: 0   # 👈 This makes the clone full, not shallow
 
       - name: Deploy to Heroku
         run: |
