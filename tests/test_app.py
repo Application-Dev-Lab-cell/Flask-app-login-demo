@@ -17,14 +17,16 @@ def test_login_page(client):
     response = client.get('/login')
     assert response.status_code == 200
 
-def test_login_form(client):
-    # Simulate posting credentials to /login
+def test_login_success(client):
     response = client.post('/login', data={
-        'username': 'testuser',
-        'password': 'testpass'
+        'username': 'admin',   # replace with real valid user
+        'password': 'password'
     }, follow_redirects=True)
-
-    # Depending on your logic, check for redirect or dashboard content
-    assert response.status_code in (200, 302)
-    # Example: if dashboard shows "Welcome", check that
     assert b"dashboard" in response.data or b"Welcome" in response.data
+
+def test_login_failure(client):
+    response = client.post('/login', data={
+        'username': 'wrong',
+        'password': 'wrong'
+    }, follow_redirects=True)
+    assert b"Invalid credentials" in response.data
